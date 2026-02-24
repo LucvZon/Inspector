@@ -179,8 +179,7 @@ def count_baseerrror(path,ctgtotallen,datatype,ave_depth):
 		depth=int(c.split('\t')[6])
 		if nread<readcutoff*depth:
 			continue
-		for i in range(nread,depth+1):
-			p+=statsmodels.stats.proportion.binom_test(i, depth, prop=propvalue, alternative='larger')
+			p = statsmodels.stats.proportion.binom_test(nread, depth, prop=propvalue, alternative='larger')
 
 		
 		if p<pcutoff :
