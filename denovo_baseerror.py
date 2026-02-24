@@ -25,15 +25,15 @@ def getsnv(path,chrom,mincount,maxcov,mindepth,min_eval_depth=0):
 		mindepth=maxcov/10.0
 	
 	# Determine the actual depth threshold for looking at a site
-    eval_threshold = min_eval_depth if min_eval_depth > 0 else mincount
-    # Determine the absolute minimum supporting reads needed (maintaining the 40% ratio logic)
-    read_floor = (min_eval_depth * 0.4) if min_eval_depth > 0 else mincount
+	eval_threshold = min_eval_depth if min_eval_depth > 0 else mincount
+	# Determine the absolute minimum supporting reads needed (maintaining the 40% ratio logic)
+	read_floor = (min_eval_depth * 0.4) if min_eval_depth > 0 else mincount
 
 	while a!='':
 		if a.split('\t')[2]!='N' and mindepth<=int(a.split('\t')[3]) <=maxcov:
 			validctgbase+=1
-        if int(a.split('\t')[3]) < eval_threshold or int(a.split('\t')[3])-a.split('\t')[4].count('*') > maxcov:
-            a=f.readline(); continue
+		if int(a.split('\t')[3]) < eval_threshold or int(a.split('\t')[3])-a.split('\t')[4].count('*') > maxcov:
+			a=f.readline(); continue
 		info=a.split('\t')[4]
 		info=info.replace(',','.')
 		info=re.sub('\^.','',info)
