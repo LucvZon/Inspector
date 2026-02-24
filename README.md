@@ -1,3 +1,9 @@
+# Fork Notice
+This is a modified fork of [ChongLab/Inspector](https://github.com/ChongLab/Inspector). This fork introduces a critical statistical bug fix and adds a  feature for depth thresholding.
+
+- **New feature**: Added a new CLI argument to inspector.py that allows you to set a hard minimum depth threshold for evaluating small-scale errors (e.g., `--min_eval_depth 30`). Previously, Inspector hardcoded the evaluation threshold to 40% of the average contig coverage, making it unreliable when evaluating  datasets with low-coverage contigs. This new parameter safely decouples the depth floor from the error-supporting read logic.
+- **Bug fix**: Fixed a major statistical math error in denovo_baseerror.py. The original code placed the statsmodels binomial test (alternative='larger') inside a cumulative for loop, which incorrectly added overlapping tail probabilities together and artificially inflated the final p-value. This caused Inspector to aggressively discard true small-scale errors (SNPs/indels) in noisy datasets.
+
 # Inspector
 
 A reference-free assembly evaluator.
