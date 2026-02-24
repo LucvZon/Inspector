@@ -21,6 +21,7 @@ parser.add_argument('--ref',type=str,default=False,help='OPTIONAL reference geno
 
 parser.add_argument('-t','--thread',type=int,default=8,help='number of threads. [8]')
 parser.add_argument('--min_depth',type=int,default=False,help='minimal read-alignment depth for a contig base to be considered in QV calculation. [20%% of average depth]')
+parser.add_argument('--min_eval_depth', type=int, default=0, help='Hard depth threshold for evaluating a position for small-scale errors. Overrides the default 40%% average depth threshold.')
 parser.add_argument('--min_contig_length',type=int,default=10000,help='minimal length for a contig to be evaluated. [10000]')
 parser.add_argument('--min_contig_length_assemblyerror',type=int,default=1000000,help='minimal contig length for assembly error detection. [1000000]')
 parser.add_argument('--min_assembly_error_size',type=int,default=50,help='minimal size for assembly errors. [50]')
@@ -163,7 +164,7 @@ if not denovo_args.skip_base_error:
 		debreak_det=multiprocessing.Pool(denovo_args.thread)
 		os.system('mkdir '+denovo_args.outpath+'base_error_workspace')
 		for chrom in chromosomes_map:
-			debreak_det.apply_async(denovo_baseerror.getsnv,args=(denovo_args.outpath,chrom,cov*2/5,cov*2,denovo_args.min_depth))
+            debreak_det.apply_async(denovo_baseerror.getsnv,args=(denovo_args.outpath,chrom,cov*2/5,cov*2,denovo_args.min_depth, denovo_args.min_eval_depth))
 		debreak_det.close()
 		debreak_det.join()
 
