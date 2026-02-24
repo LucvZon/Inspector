@@ -11,7 +11,7 @@ def find2(li):
 			val=c
 	return val
 
-def getsnv(path,chrom,mincount,maxcov,mindepth):
+def getsnv(path,chrom,mincount,maxcov,mindepth,min_eval_depth=0):
 	logf=open(path+'Inspector.log','a')
 	logf.write('Start small-scale error detection for '+chrom+'\n')
 	logf.close()
@@ -23,12 +23,17 @@ def getsnv(path,chrom,mincount,maxcov,mindepth):
 	validctgbase=0
 	if mindepth==False and type(mindepth)==bool:
 		mindepth=maxcov/10.0
+	
+	# Determine the actual depth threshold for looking at a site
+    eval_threshold = min_eval_depth if min_eval_depth > 0 else mincount
+    # Determine the absolute minimum supporting reads needed (maintaining the 40% ratio logic)
+    read_floor = (min_eval_depth * 0.4) if min_eval_depth > 0 else mincount
 
 	while a!='':
 		if a.split('\t')[2]!='N' and mindepth<=int(a.split('\t')[3]) <=maxcov:
 			validctgbase+=1
-		if int(a.split('\t')[3]) <mincount or int(a.split('\t')[3])-a.split('\t')[4].count('*') > maxcov:
-			a=f.readline(); continue
+        if int(a.split('\t')[3]) < eval_threshold or int(a.split('\t')[3])-a.split('\t')[4].count('*') > maxcov:
+            a=f.readline(); continue
 		info=a.split('\t')[4]
 		info=info.replace(',','.')
 		info=re.sub('\^.','',info)
@@ -36,8 +41,8 @@ def getsnv(path,chrom,mincount,maxcov,mindepth):
 		info=info.replace('t','T')
 		info=info.replace('c','C')
 		info=info.replace('g','G')
-		depth=int(a.split('\t')[3])-info.count('*')
-		min_supp=max(mincount,depth*0.2)
+        depth=int(a.split('\t')[3])-info.count('*')
+        min_supp=max(read_floor, depth*0.2)
 		ins=info.count('+')
 		dels=info.count('-')
 		ifindel=False
