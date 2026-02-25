@@ -22,7 +22,7 @@ def getsnv(path,chrom,mincount,maxcov,mindepth,min_eval_depth=0):
 	numbaseerror=0
 	validctgbase=0
 	if mindepth==False and type(mindepth)==bool:
-		mindepth=maxcov/10.0
+		mindepth = min_eval_depth if min_eval_depth > 0 else mincount
 	
 	# Determine the actual depth threshold for looking at a site
 	eval_threshold = min_eval_depth if min_eval_depth > 0 else mincount
@@ -57,7 +57,7 @@ def getsnv(path,chrom,mincount,maxcov,mindepth,min_eval_depth=0):
 						num+=dd; inum+=1
 					else:
 						break
-				if int(num)<=mincount//2:
+				if int(num) < 50:
 					insseq+=[m[inum:][:int(num)]]
 				else:
 					ins-=1
@@ -76,7 +76,7 @@ def getsnv(path,chrom,mincount,maxcov,mindepth,min_eval_depth=0):
 						num+=dd; inum+=1
 					else:
 						break
-				if int(num)<=mincount//2:
+				if int(num) < 50:
 					insseq+=[m[inum:][:int(num)]]
 				else:
 					dels-=1
@@ -205,4 +205,3 @@ def count_baseerrror(path,ctgtotallen,datatype,ave_depth):
 	return iii	
 
 	
-
