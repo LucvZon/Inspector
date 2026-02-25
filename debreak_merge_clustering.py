@@ -324,15 +324,13 @@ def genotype(depth,outpath):
 		f.write(c+'\t'+gtinfo+'\t'+str(leftcov)+'\t'+str(rightcov)+'\t'+str(min(rightcov,leftcov))+'\n')
 	f.close()
 
-def filterae(depth,outpath,min_size,datatype):
+def filterae(min_eval_depth,outpath,min_size,datatype):
 	allsv=open(outpath+'assembly_errors.bed-gt','r').read().split('\n')[:-1]
 	if datatype=='hifi':
 		rat=0.8
 	else:
 		rat=0.7
 
-	highcov=depth*2
-	lowcov=depth/2
 	exp=[c for c in allsv if 'Exp' in c]
 	col=[c for c in allsv if 'Col' in c]
 	inv=[c for c in allsv if 'Inv' in c]
@@ -381,8 +379,14 @@ def filterae(depth,outpath,min_size,datatype):
 	for c in allsv:
 		if  max([int(mm) for mm in c.split('\t')[5].split('=')[1].split(';')])<min_size:
 			continue
-		if int(c.split('\t')[3]) >=10 and int(c.split('\t')[3])>=rat*int(c.split('\t')[9]) and lowcov<=int(c.split('\t')[9])<highcov:
-			new+=[c]; continue	
+		local_depth = int(c.split('\t')[9])
+		supporting_reads = int(c.split('\t')[3])
+        
+		# 1. Local depth must be >= min_eval_depth
+		# 2. Must meet the 70% (or 80%) ratio for the LOCAL depth
+		# 3. Must have at least 3 supporting reads minimum
+		if local_depth >= min_eval_depth and supporting_reads >= (rat * local_depth) and supporting_reads >= 3:
+			new+=[c]; continue
 	f=open(outpath+'structural_error.bed','w')
 	f.write('#Contig_Name\tStart_Position\tEnd_Position\tSupporting_Read\tType\tSize\tHaplotype_Info\tDepth_Left\tDepth_Right\tDepth_Min\tSupporting_Read_Name\tHaplotype_Switch_Info\n')
 	for c in new:
@@ -408,6 +412,5 @@ def filterae(depth,outpath,min_size,datatype):
 		totalbase+=size
 
 	return totalbase
-
 
 
