@@ -130,7 +130,7 @@ if not denovo_args.skip_structural_error_detect:
 
 
 cov=denovo_static.mapping_info_ctg(denovo_args.outpath,chromosomes_large,chromosomes_small,totalcontiglen,totalcontiglen_large)
-minsupp=max(1,round(cov/10.0))
+minsupp=max(3, int(denovo_args.min_eval_depth * 0.15))
 
 t3=time.time()
 logf=open(denovo_args.outpath+'Inspector.log','a')
@@ -143,13 +143,13 @@ if not denovo_args.skip_structural_error:
 	os.system('mkdir '+denovo_args.outpath+'ae_merge_workspace')
 	for chrom in largecontig_length:
 		contiglength=largecontig_length[chrom]
-		debreak_cluster.cluster(denovo_args.outpath,chrom,contiglength,minsupp,cov*2)
-		debreak_cluster.cluster_ins(denovo_args.outpath,chrom,contiglength,minsupp,cov*2,'ins')
-		debreak_cluster.cluster_ins(denovo_args.outpath,chrom,contiglength,minsupp,cov*2,'inv')
+		debreak_cluster.cluster(denovo_args.outpath,chrom,contiglength,minsupp, 999999)
+		debreak_cluster.cluster_ins(denovo_args.outpath,chrom,contiglength,minsupp, 999999,'ins')
+		debreak_cluster.cluster_ins(denovo_args.outpath,chrom,contiglength,minsupp, 999999,'inv')
 	denovo_static.assembly_info_cluster(denovo_args.outpath,denovo_args.min_assembly_error_size,denovo_args.max_assembly_error_size)
 	debreak_cluster.genotype(cov,denovo_args.outpath)
 	
-	aelen_structuralerror=debreak_cluster.filterae(cov,denovo_args.outpath,denovo_args.min_assembly_error_size,denovo_args.datatype)
+	aelen_structuralerror=debreak_cluster.filterae(denovo_args.min_eval_depth, denovo_args.outpath, denovo_args.min_assembly_error_size, denovo_args.datatype)
 
 t4=time.time()
 logf=open(denovo_args.outpath+'Inspector.log','a')
@@ -164,7 +164,7 @@ if not denovo_args.skip_base_error:
 		debreak_det=multiprocessing.Pool(denovo_args.thread)
 		os.system('mkdir '+denovo_args.outpath+'base_error_workspace')
 		for chrom in chromosomes_map:
-			debreak_det.apply_async(denovo_baseerror.getsnv,args=(denovo_args.outpath,chrom,cov*2/5,cov*2,denovo_args.min_depth, denovo_args.min_eval_depth))
+			debreak_det.apply_async(denovo_baseerror.getsnv,args=(denovo_args.outpath,chrom,cov*2/5,999999,denovo_args.min_depth, denovo_args.min_eval_depth))
 		debreak_det.close()
 		debreak_det.join()
 
@@ -249,5 +249,4 @@ logf=open(denovo_args.outpath+'Inspector.log','a')
 logf.write('TIME: Generate plots: '+str(t8-t7)+'\n')
 logf.write('Inspector evaluation finished. Bye.\n')
 logf.close()
-
 
