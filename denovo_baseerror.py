@@ -167,7 +167,7 @@ def count_baseerrror(path,ctgtotallen,datatype,ave_depth):
 	else:
 		propvalue=0.4
 		pcutoff=0.05
-		readcutoff=0.5
+		readcutoff=0.8
 		if ave_depth<25:
 			pcutoff=0.1
 
