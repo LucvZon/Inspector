@@ -2,6 +2,7 @@ import re
 import os
 import statsmodels.stats.proportion
 import statsmodels.stats.multitest
+import scipy.stats
 
 def find2(li):
 	num=0
@@ -174,15 +175,14 @@ def count_baseerrror(path,ctgtotallen,datatype,ave_depth):
 	allpvalue=[]
 
 	for c in allsnv:
-		p=0
 		nread=int(c.split('\t')[5])
 		depth=int(c.split('\t')[6])
-		if nread<readcutoff*depth:
+		if nread < readcutoff * depth:
 			continue
-			p = statsmodels.stats.proportion.binom_test(nread, depth, prop=propvalue, alternative='larger')
+            
+		p = scipy.stats.binom.sf(nread - 1, depth, propvalue)
 
-		
-		if p<pcutoff :
+		if p < pcutoff:
 			iii+=1
 			baseerror+=[c+'\t'+str(p)]
 			if 'BaseSubstitution' in c:
